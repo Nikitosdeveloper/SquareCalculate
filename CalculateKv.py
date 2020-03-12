@@ -13,25 +13,12 @@ Config.set('graphics','width',1081)#{
 Config.set('graphics','height',2341)#изменяем размер экрана
 #Config.set('graphics','resizable',0)#}
 
-global b
-b = ['1','2','3','4','5','6','7','8','9','0','-','+']
-global level
-level = 0
-global one_zero
-one_zero = True
-global one_plus
-one_plus = True
-global two_zero
-two_zero = True
-global two_plus
-two_plus = True
-global three_zero
-three_zero = True
-global three_plus
-three_plus= True
-global level2_nomber
-level2_nomber = True
-global last_symbol
+b = ['1','2','3','4','5','6','7','8','9','0',]
+x2_number = 0
+plys_add = False
+minus_add = True
+numeral_add = True
+x_number = 0
 
 class MyApp(App):
 	def on_value(self,instance,value):
@@ -51,22 +38,16 @@ class MyApp(App):
 		self.ti1.text = '0'
 		self.ti2.text = str('a = '+ ' ' + ' ' + 'b = '+ ' ' + '\n' + 'c = ' + ' ' +  'D = ')
 		self.formula = ""
-		global level
-		level = 0
-		global one_zero
-		one_zero = True
-		global one_plus
-		one_plus = True
-		global two_zero
-		two_zero = True
-		global two_plus
-		two_plus = True
-		global three_zero
-		three_zero = True
-		global three_plus
-		three_plus = True
-		global level2_nomber
-		level2_nomber = True
+		global x2_number
+		x2_number = 0
+		global plys_add
+		plys_add = False
+		global minus_add
+		minus_add = True
+		global numeral_add
+		numeral_add = True
+		global x_number
+		x_number = 1
 		self.modal.dismiss()
 	def calcualte(self):
 		#функция которая решает квадратные у-я
@@ -197,126 +178,52 @@ class MyApp(App):
 		return bl
 	def add_number(self,instance):
 		#функция которая позволяет вводить данные на текстовую паннель
-		global level
-		global one_zero
-		global one_plus
-		global two_zero
-		global two_plus
-		global three_zero
-		global three_plus
-		global level2_nomber
-		global last_symbol
-		if level == 0:
-			if instance.text in b:
-				if instance.text == '-' and one_zero:
-					self.formula += instance.text
-					last_symbol = instance.text
-					one_zero = False
-					one_plus = False
-				elif instance.text != '-' and instance.text != '+':
-					self.formula += instance.text
-					last_symbol = instance.text
-					one_zero = False
-					one_plus = False
-			elif instance.text == "x²":
-				self.formula +=instance.text
-				last_symbol = instance.text
-				one_zero = False
-				one_plus = False
-				level += 1
-		elif level == 1:
-			if instance.text in b:
-				if instance.text == '-' and two_zero:
-					self.formula += instance.text
-					last_symbol = instance.text
-					two_zero = False
-					two_plus = False
-				elif instance.text == '+' and two_plus:
-					self.formula += instance.text
-					last_symbol = instance.text
-					two_zero = False
-					two_plus = False
-				elif instance.text != '-' and instance.text != '+':
-					if (not two_plus) or (not two_zero):
-						self.formula += instance.text
-						last_symbol = instance.text
-						two_zero = False
-						two_plus = False
-						level = 4
-					else:
-						self.formula += '+' + instance.text
-						last_symbol = instance.text
-						two_zero = False
-						two_plus = False
-						level = 4
-			elif instance.text == 'x':
-				if (not two_plus) or (not two_zero):
-					self.formula += instance.text
-					last_symbol = instance.text
-					level = 2
-				else:
-					self.formula += '+' + instance.text
-					last_symbol = instance.text
-					level = 2
-			elif two_zero and two_plus and instance.text == '=':
-				level = 3
+		global x2_number
+		global plys_add
+		global minus_add
+		global numeral_add
+		global x_number
+		if instance.text == 'x²' and  x2_number == 0:
+			x2_number = 1
+			plys_add = True
+			minus_add = True
+			numeral_add = False
+			self.formula += 'x²'
+		elif instance.text == '+' and plys_add:
+			plys_add = False
+			minus_add = False
+			numeral_add = True
+			if self.formula[-1] == '²' and self.formula[-2] =='x':
+				x_number = 0
+			self.formula += '+'
+		elif instance.text == '-' and minus_add:
+			plys_add = False
+			minus_add = False
+			numeral_add = True
+			if self.formula != '':
+				if self.formula[-1] == '²' and self.formula[-2] =='x':
+					x_number = 0
+			self.formula += '-'
+		elif instance.text in b and numeral_add:
+			self.formula += instance.text
+			if x2_number == 0:
+				minus_add = False
+		elif instance.text == 'x' and x_number == 0:
+			x_number = 1
+			plys_add = True
+			minus_add = True
+			numeral_add = False
+			self.formula += 'x'
+		elif instance.text == '=' and x2_number == 1:
+			if self.formula[-1] != '+' and self.formula[-1] != '-':
 				self.formula += '=0'
 				self.ti2.text = self.calcualte()
 				self.modal.open()
-		elif level == 4:
-			if instance.text in b and instance.text != '-' and instance.text != '+':
-				self.formula += instance.text
-				last_symbol = instance.text
-			elif instance.text == 'x':
-				self.formula += instance.text
-				last_symbol = instance.text
-				level = 2
-			elif instance.text == '=':
-				level = 3
-				self.formula += '=0'
-				self.ti2.text = self.calcualte()
-				self.modal.open()
-		elif level == 2:
-			if instance.text in b:
-				if instance.text == '-' and three_zero:
-					self.formula += instance.text
-					last_symbol = instance.text
-					three_zero = False
-					three_plus = False
-				elif instance.text == '+' and three_plus:
-					self.formula += instance.text
-					last_symbol = instance.text
-					three_zero = False
-					three_plus = False
-				elif instance.text != '-' and instance.text != '+':
-					if (not three_plus) or (not three_zero):
-						self.formula += instance.text
-						last_symbol = instance.text
-						three_zero = False
-						three_plus = False
-						level2_nomber = False
-					else:
-						self.formula += '+' + instance.text
-						last_symbol = instance.text
-						three_zero = False
-						three_plus = False
-						level2_nomber = False
-			elif instance.text == '=':
-				if three_plus and three_zero:
-					level = 3
-					self.formula += '=0'
-					self.ti2.text = self.calcualte()
-					self.modal.open()
-				elif not level2_nomber:
-					level = 3
-					self.formula += '=0'
-					self.ti2.text = self.calcualte()
-					self.modal.open()
 		if self.formula == '':
 			self.ti1.text = '0'
-		else:	
-			self.ti1.text = str(self.formula.replace('x^2','x²'))
-		print(last_symbol)
+		else:
+			self.ti1.text = self.formula
+
 #запуск программы
 if __name__ == "__main__":
 	MyApp().run()
