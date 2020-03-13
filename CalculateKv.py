@@ -19,10 +19,11 @@ plys_add = False
 minus_add = True
 numeral_add = True
 x_number = 0
+last_symbol = ''
 
 class MyApp(App):
 	def on_value(self,instance,value):
-		#функция которая меняет размер шрифта
+		#функция которая меняет позицию в тексте
 		self.ti2.cursor = self.cursorm
 		text_massive = self.ti2.text.split('\n')
 		for i in range(len(text_massive)):
@@ -48,6 +49,8 @@ class MyApp(App):
 		numeral_add = True
 		global x_number
 		x_number = 1
+		global last_symbol
+		last_symbol = ''
 		self.modal.dismiss()
 	def calcualte(self):
 		#функция которая решает квадратные у-я
@@ -144,7 +147,7 @@ class MyApp(App):
 		self.modal.add_widget(bl2)
 		b1 = Button(text = '+', font_size = 60,on_press = self.add_number, color = [0,0,0,1], background_color = [96,96,96,1])
 		gl.add_widget(b1)
-		b1 = Button(text = '<==', font_size = 60,on_press = self.add_number, color = [0,0,0,1], background_color = [96,96,96,1])
+		b1 = Button(text = '<==', font_size = 60,on_press = self.delete_number, color = [0,0,0,1], background_color = [96,96,96,1])
 		gl.add_widget(b1)
 		b1 = Button(text = '-', font_size = 60,on_press = self.add_number, color = [0,0,0,1], background_color = [96,96,96,1])
 		gl.add_widget(b1)
@@ -183,6 +186,7 @@ class MyApp(App):
 		global minus_add
 		global numeral_add
 		global x_number
+		global last_symbol
 		if instance.text == 'x²' and  x2_number == 0:
 			x2_number = 1
 			plys_add = True
@@ -208,7 +212,7 @@ class MyApp(App):
 			self.formula += instance.text
 			if x2_number == 0:
 				minus_add = False
-		elif instance.text == 'x' and x_number == 0:
+		elif instance.text == 'x' and x_number == 0 and x2_number == 1 and (last_symbol in b or last_symbol == '+' or last_symbol == '-'):
 			x_number = 1
 			plys_add = True
 			minus_add = True
@@ -223,6 +227,43 @@ class MyApp(App):
 			self.ti1.text = '0'
 		else:
 			self.ti1.text = self.formula
+		if self.formula != '':
+			last_symbol = self.formula[-1]
+
+	def delete_number(self,instance):
+		#функция которая удаляет последний символ
+		global x2_number
+		global plys_add
+		global minus_add
+		global numeral_add
+		global x_number
+		global last_symbol
+		if last_symbol == '²':
+			x2_number = 0
+			plys_add = False
+			minus_add = False
+			numeral_add = True
+			self.formula = self.formula[:-2]
+		elif last_symbol == 'x':
+			x_number = 0
+			plys_add = False
+			minus_add = False
+			numeral_add = True
+			self.formula = self.formula[:-1]
+		elif last_symbol == '-' or last_symbol == '+':
+			 plys_add = True
+			 minus_add = True
+			 numeral_add = False
+			 self.formula = self.formula[:-1]
+		elif last_symbol in b:
+			self.formula = self.formula[:-1]
+		if self.formula == '':
+			self.ti1.text = '0'
+			last_symbol = ''
+		else:
+			self.ti1.text = self.formula
+			last_symbol = self.formula[-1]
+
 
 #запуск программы
 if __name__ == "__main__":
